@@ -9,6 +9,10 @@ public class WaveSystem : MonoBehaviour {
     [Json("Waves")]
     private Wave waves;
 
+	[SerializeField]
+	[Json("SomeNumber")]
+	private float someNumber;
+
 	// Use this for initialization
 	void Start () {
 

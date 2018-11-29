@@ -259,5 +259,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waves:
-    interval: 0
+    interval: 15
     enemies: 
+  someNumber: 567465
