@@ -259,6 +259,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waves:
-    interval: 15
-    enemies: 
+  - interval: 455
+    someClass:
+    - superNumber: 123
+    - superNumber: 565
+  - interval: 788
+    someClass:
+    - superNumber: 3457
+    - superNumber: 4568
+    - superNumber: 8654
   someNumber: 567465

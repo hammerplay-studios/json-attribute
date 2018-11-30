@@ -7,16 +7,16 @@ public class WaveSystem : MonoBehaviour {
 
     [SerializeField]
     [Json("Waves")]
-    private Wave waves;
+    private Wave[] waves;
 
 	[SerializeField]
-	[Json("SomeNumber")]
+	
 	private float someNumber;
 
 	// Use this for initialization
 	void Start () {
 
-        Debug.Log(waves.interval);
+       
 		
 	}
 	
@@ -31,7 +31,13 @@ public class Wave {
 
     public float interval;
 
-    public EnemyType[] enemies;
+	public SomeClass[] someClass;
+	//public float[] enemies;
 
-    public enum EnemyType { Human, Bike, Car }
+	public enum EnemyType { Human, Bike, Car }
+}
+
+[System.Serializable]
+public class SomeClass {
+	public int superNumber = 39;
 }

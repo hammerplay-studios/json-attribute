@@ -111,14 +111,27 @@ namespace Hammerplay.Utils.JsonAttribute {
 						if (attribute != null) {
 							//string key = attribute.ParameterPath + "-" + objectFields[i].FieldType;
 							string key = attribute.ParameterPath;
-							Type t = Type.GetType(objectFields[i].FieldType.ToString());
 
 							//Debug.Log(objectFields[i].FieldType);
 							if (resourceJSONDictionary.ContainsKey(key)) {
+								string jsonString = new JsonWriter().Write(resourceJSONDictionary[attribute.ParameterPath]);
+								Type t;
+								//object objectReference = JsonUtility.FromJson(jsonString, objectFields[i].FieldType);
+								object objectReference = JsonHelper.FromJson<Wave>(jsonString);
+								
+								objectFields[i].SetValue(mono,
+									Convert.ChangeType(objectReference, objectFields[i].FieldType));
+
+								/*Dictionary<string, object> objectInstance = new JsonReader().Read(, typeof(Dictionary<string, object>)) as Dictionary<string, object>;
+								foreach (KeyValuePair<string, object> item in objectInstance) {
+									Debug.Log(item.Key + ": " + item.Value);
+								}
+								Debug.Log("Wave: " + objectInstance);*/
 								//Debug.Log(resourceJSONDictionary[attribute.ParameterPath]);
 								//var waves = (Wave)resourceJSONDictionary[attribute.ParameterPath];
-								Debug.Log(resourceJSONDictionary[attribute.ParameterPath]);
-								Debug.Log(resourceJSONDictionary[attribute.ParameterPath] as Wave);
+								//Debug.Log(resourceJSONDictionary[attribute.ParameterPath]);
+								//Debug.Log(resourceJSONDictionary[attribute.ParameterPath] as Wave);
+								//Debug.Log(GetObject<Wave>(resourceJSONDictionary[attribute.ParameterPath] as Dictionary<string, object>));
 								/*foreach (var item in resourceJSONDictionary[attribute.ParameterPath] as Dictionary <string, object>) {
 									Debug.Log(item);
 								}*/
@@ -149,6 +162,43 @@ namespace Hammerplay.Utils.JsonAttribute {
 			return Activator.CreateInstance(t);
 		}
 
+		private T GetObject<T>(Dictionary<string, object> dict) {
+			Type type = typeof(T);
+			var obj = Activator.CreateInstance(type);
+			
+			foreach (var kv in dict) {
+				Debug.LogFormat("key: {0}, value: {1}", kv.Key, kv.Value);
 
+				Debug.Log(type.GetField(kv.Key));
+				type.GetField(kv.Key).SetValue(obj, kv.Value);
+			}
+			return (T)obj;
+		}
+
+
+	}
+
+	public static class JsonHelper {
+		public static T[] FromJson<T>(string json) {
+			Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+			return wrapper.Items;
+		}
+
+		public static string ToJson<T>(T[] array) {
+			Wrapper<T> wrapper = new Wrapper<T>();
+			wrapper.Items = array;
+			return JsonUtility.ToJson(wrapper);
+		}
+
+		public static string ToJson<T>(T[] array, bool prettyPrint) {
+			Wrapper<T> wrapper = new Wrapper<T>();
+			wrapper.Items = array;
+			return JsonUtility.ToJson(wrapper, prettyPrint);
+		}
+
+		[Serializable]
+		private class Wrapper<T> {
+			public T[] Items;
+		}
 	}
 }
