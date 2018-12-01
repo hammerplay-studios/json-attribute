@@ -147,14 +147,30 @@ namespace Hammerplay.Utils.JsonAttribute
                                 else
                                 {
                                     string jsonString = "{\"Items\": " + new JsonWriter().Write(resourceJSONDictionary[attribute.ParameterPath]) + "}";
-                                    object objectReference = JsonHelper.FromJson<Wave>(jsonString);
 
-                                  //if (!(objectFields[i] is Array))
-                                    //{
-                                    //    objectReference = ArrayToList( JsonHelper.FromJson<Wave>(jsonString));
-                                    //}
+                                    object objectReference;                                                                     
 
-                                    objectFields[i].SetValue(mono, Convert.ChangeType(objectReference, objectFields[i].FieldType));
+                                    if (objectFields[i].FieldType.IsArray)
+                                    {
+                                        MethodInfo method = typeof(JsonHelper).GetMethod("FromJson");
+                                        MethodInfo generic = method.MakeGenericMethod(objectFields[i].FieldType.GetElementType());
+                                        objectReference = (generic.Invoke(method, new object[] { jsonString }));
+
+                                    }
+                                    else
+                                    {
+                                        MethodInfo method = typeof(JsonHelper).GetMethod("FromJson");
+                                        MethodInfo generic = method.MakeGenericMethod(objectFields[i].FieldType.GetGenericArguments()[0]);
+                                        objectReference = (generic.Invoke(method, new object[] { jsonString }));
+
+
+                                        MethodInfo arrayToListMethod = typeof(JsonAttributeWindow).GetMethod("ArrayToList");
+                                        MethodInfo arrayToListGeneric = arrayToListMethod.MakeGenericMethod(objectFields[i].FieldType.GetGenericArguments()[0]);
+                                        objectReference = (arrayToListGeneric.Invoke(arrayToListMethod, new object[] { objectReference }));
+
+                                    }                                                                   
+
+                                       objectFields[i].SetValue(mono, Convert.ChangeType(objectReference, objectFields[i].FieldType));
                                 }
 
 
@@ -174,17 +190,8 @@ namespace Hammerplay.Utils.JsonAttribute
 
 
         }
-
-        public List<Wave> ArrayToList(Wave[] array)
-        {
-            List<Wave> list = new List<Wave>();
-            for (int j = 0; j < array.Length; j++)
-            {
-                list.Add(array[j]);
-            }
-            return list;
-
-        }
+        
+        
 
         private object GetInstanceDerp(string strFullyQualifiedName)
         {
@@ -207,20 +214,26 @@ namespace Hammerplay.Utils.JsonAttribute
             return (T)obj;
         }
 
+        public static List<T> ArrayToList<T>(T[] array)
+        {
+            List<T> list = new List<T>();
+            for (int j = 0; j < array.Length; j++)
+            {
+                list.Add(array[j]);
+            }
 
+            return list;
+
+        }
     }
 
     public static class JsonHelper
     {
+        
         public static T[] FromJson<T>(string json)
         {
             Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
             return wrapper.Items;
-        }
-
-        public static void FromJsonArray(string json, FieldInfo field)
-        {
-            JsonUtility.FromJsonOverwrite(json, field);
         }
 
         public static string ToJson<T>(T[] array)
