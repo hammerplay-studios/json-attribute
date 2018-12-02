@@ -1,30 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using Hammerplay.Utils.JsonAttribute;
 
 public class WaveSystem : MonoBehaviour {
 
     [SerializeField]
-    [Json("Waves")]
+    [Json("waves")]
     private Wave[] waves;
 
 	[SerializeField]
 	
 	private float someNumber;
-
-	// Use this for initialization
-	void Start () {
-
-       
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    
 }
+
+
 
 [System.Serializable]
 public class Wave {
